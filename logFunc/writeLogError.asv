@@ -1,0 +1,7 @@
+function writeLogError(link,log_str)
+%WRITELOGERROR Fonction permettant d'afficher un message de log
+%   Detailed explanation goes here
+    new_log = "[ERROR]: " + log;
+    set(link.LogTextArea,'Value',new_log);
+end
+
