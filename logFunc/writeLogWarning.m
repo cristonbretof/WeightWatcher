@@ -3,6 +3,6 @@ function writeLogWarning(link,log)
 %   Detailed explanation goes here
     set(link.LogTextArea,'FontColor','orange');
     new_log = append("[WARNING]: ",log);
-    set(link.LogTextArea,'Value',new_log);
+    set(link.LogTextArea,'Value',link.LogTextArea.Value + new_log);
 end
 

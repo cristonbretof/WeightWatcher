@@ -4,7 +4,7 @@ function plotCapt(link,total_width,total_height,fixbar_height,type)
 %   prototype (en simulation) tout en gardant l'abstraction venant de la
 %   sélection du capteur.
 
-base_height = total_height/5; % Hauteur de la base
+base_height = 0.1*total_height; % Hauteur de la base
 
 if type == "Capacitive"
 

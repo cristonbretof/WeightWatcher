@@ -3,6 +3,6 @@ function writeLogInfo(link,log)
 %   Detailed explanation goes here
     set(link.LogTextArea,'FontColor','black');
     new_log = append("[INFO]: ",log);
-    set(link.LogTextArea,'Value',new_log);
+    set(link.LogTextArea,'Value',link.LogTextArea.Value + new_log);
 end
 

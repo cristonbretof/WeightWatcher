@@ -1,7 +1,9 @@
-function ret = simulation(link,systruct)
+function [ret, msg] = simulation(link,dimPanelData,lamePanelData,...
+                            captPanelData,ampPanelData,actionPanelData)
 %SIMULATION Summary of this function goes here
 %   Detailed explanation goes here
-    ret = 0;
+    coinTableData = link.UICoinTable.Data;
+    
     
     
 end
