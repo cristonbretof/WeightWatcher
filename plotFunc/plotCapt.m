@@ -27,6 +27,7 @@ Z_bot = [0 0 height height;...
     
 Z_top = Z_bot + spacing;
 
-plot3(link,X,Y,Z_bot,X,Y,Z_top);
+C = [0.7,0.2,0.05];
+fill3(link,X,Y,Z_bot,C,X,Y,Z_top,C);
 end
 
