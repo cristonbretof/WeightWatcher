@@ -1,4 +1,4 @@
-function plotLame(app,lame_length,lame_array,lame_width)
+function plotLame(app,lame_length,lame_array)
 %PLOTLAME Fonction permettant d'afficher la lame en action
 %   On se sert de cette fonction pour afficher dynamiquement la lame
 %   lorsqu'on fait une simulation du système. La torsion ainsi que la
@@ -8,7 +8,7 @@ function plotLame(app,lame_length,lame_array,lame_width)
 % Define initial values (x,y)
 n_plot_array = 0:0.1:lame_length-1;
 
-plot(app,n_plot_array,lame_array,'LineWidth',lame_width);
+plot(app,n_plot_array,lame_array,'LineWidth',2);
 
 end
 

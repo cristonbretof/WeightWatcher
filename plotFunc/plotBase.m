@@ -1,28 +1,28 @@
 function plotBase(link,total_length,total_height,action_mid_x, ...
-    bob_radius,lame,lame_length,lame_width,capt_length,capt_spacing)
+    bob_radius,lame,lame_length,capt_length,capt_spacing)
 %PLOTBASE Fonction permettant de présenter la base de la balance
 %   On utilise cette fonction pour présenter les éléments statiques de la
 %   balance. On appelle cette fonction seulement lorsqu'on réinitialise le
 %   simulateur. La représentation est en 2D.
 
-base_height = 0.1*total_height; % Hauteur de la base
+base_height = 0.09*total_height; % Hauteur de la base
 
 capt_thickness = 0.4;
 
 fixbar_height = total_height; % Hauteur de la plaque de métal tenant la fixe pour la lame
-fixbar_width = base_height; % Hauteur de la plaque de métal tenant la fixe pour la lame
+fixbar_width = base_height*0.7; % Hauteur de la plaque de métal tenant la fixe pour la lame
 fixbar_x_pos = 0; % Position en x de de la plaque tenant la fixe
 
 action_height = 0.75*fixbar_height; % Hauteur de l'actionneur
 action_width = 3*bob_radius; % Largeur de l'actionneur (base)
 
 % Position de la lame en hauteur
-lame_y_pos = base_height + fixbar_height - capt_spacing/2;
+lame_y_pos = base_height + fixbar_height - capt_spacing/3;
 lame_array = lame + lame_y_pos;
 
 % Lame flexible (definition)
 n_plot_array = 0:0.1:lame_length-1;
-plot(link,n_plot_array,lame_array,'LineWidth',lame_width);
+plot(link,n_plot_array,lame_array,'LineWidth',2);
 
 % Emplacement du point (sur la lame) qui sera suivi par l'actionneur et le plateau
 mid_y = lame_array(ceil(numel(lame_array)/2));
@@ -54,7 +54,7 @@ top_height = base_height + fixbar_height - capt_thickness;
 rectangle(link,'Position',[total_length-capt_length,top_height, ...
     capt_length,capt_thickness],'FaceColor',[0.7,0.2,0.05]);
 % Électrode inférieure du capteur
-rectangle(link,'Position',[total_length-capt_length,top_height-capt_spacing, ...
+rectangle(link,'Position',[total_length-capt_length,top_height-capt_spacing/2, ...
     capt_length,capt_thickness],'FaceColor',[0.7,0.2,0.05]);
 
 % Bobine de l'actionneur linéaire (hauteur variable)
