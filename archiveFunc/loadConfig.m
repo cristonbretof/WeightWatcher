@@ -4,7 +4,8 @@ function loadConfig(app,filename)
     % Extract data from selected config file
     
 % Load all data from this specific filename
-load(".\config\"+filename);
+load(".\config\"+filename,'dimensionStruct','lameflexStruct','captStruct',...
+    'timeStruct','actionStruct');
 
 % Extract structs from newly loaded data
 app.dimensionStruct = dimensionStruct;
