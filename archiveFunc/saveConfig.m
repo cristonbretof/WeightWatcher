@@ -10,7 +10,6 @@ lameflexStruct = app.lameflexStruct;
 captStruct = app.captStruct;
 timeStruct = app.timeStruct;
 actionStruct = app.actionStruct;
-
 save(path,'dimensionStruct','lameflexStruct',...
     'captStruct','timeStruct','actionStruct');
 end
