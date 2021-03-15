@@ -7,7 +7,7 @@ function plotBase(link,total_length,total_height,action_mid_x, ...
 
 base_height = 0.09*total_height; % Hauteur de la base
 
-capt_thickness = 0.4;
+capt_thickness = 0.2*base_height;
 
 fixbar_height = total_height; % Hauteur de la plaque de métal tenant la fixe pour la lame
 fixbar_width = base_height*0.7; % Hauteur de la plaque de métal tenant la fixe pour la lame

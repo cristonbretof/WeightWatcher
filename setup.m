@@ -42,6 +42,6 @@ end
 clear keys values key cadCoinTable
 
 % Bind values to mainCAO app
-app.coinCADMap = coinCADMap
-app.minCADYear = minCADYear
-app.maxCADYear = maxCADYear
+app.coinCADMap = coinCADMap;
+app.minCADYear = minCADYear;
+app.maxCADYear = maxCADYear;

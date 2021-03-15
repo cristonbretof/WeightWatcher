@@ -5,6 +5,7 @@ function plotAction(link,xpos,ypos,radius)
 
 % Actionneur linéaire
 [X,Y,Z] = cylinder(radius,50);
-surf(link,X+xpos,Y+ypos,Z,'EdgeColor',[0.7,0.5,0.5],'FaceColor',[0.6,0.1,0.05]);
+surf(link,X+xpos,Y+ypos,Z,'EdgeColor',[0.7,0.5,0.5],'FaceColor',...
+    [0.6,0.1,0.05]);
 end
 
