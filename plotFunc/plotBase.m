@@ -13,7 +13,7 @@ fixbar_height = total_height; % Hauteur de la plaque de métal tenant la fixe pou
 fixbar_width = base_height*0.7; % Hauteur de la plaque de métal tenant la fixe pour la lame
 fixbar_x_pos = 0; % Position en x de de la plaque tenant la fixe
 
-action_height = 0.80*fixbar_height; % Hauteur de l'actionneur
+action_height = 0.85*fixbar_height; % Hauteur de l'actionneur
 action_width = 3*bob_radius; % Largeur de l'actionneur (base)
 
 % Position de la lame en hauteur
