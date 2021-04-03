@@ -12,12 +12,13 @@ timeStruct = app.timeStruct;
 actionStruct = app.actionStruct;
 coinCellArray = app.coinCellArray;
 simulCellArray = app.simulCellArray;
+allParamNames = app.allParametersCellArray;
 save(path,'dimensionStruct','lameflexStruct',...
     'captStruct','timeStruct','actionStruct','coinCellArray',...
-    'simulCellArray');
+    'simulCellArray','allParamNames');
 
 % Clear remaining variables introduced by load
 clear dimensionStruct lameflexStruct captStruct timeStruct actionStruct ...
-    coinCellArray simulCellArray
+    coinCellArray simulCellArray allParamNames
 end
 
