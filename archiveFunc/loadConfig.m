@@ -15,7 +15,6 @@ app.timeStruct = timeStruct;
 app.actionStruct = actionStruct;
 app.coinCellArray = coinCellArray;
 app.simulCellArray = simulCellArray;
-app.allParametersCellArray = allParamNames;
 
 % Clear remaining variables introduced by load
 clear dimensionStruct lameflexStruct captStruct timeStruct actionStruct ...
