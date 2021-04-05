@@ -13,12 +13,15 @@ actionStruct = app.actionStruct;
 coinCellArray = app.coinCellArray;
 simulCellArray = app.simulCellArray;
 allParamNames = app.allParametersCellArray;
+dropDownCoinList = app.dropDownCoinList;
+balayageCellArray = app.balayageCellArray;
+
 save(path,'dimensionStruct','lameflexStruct',...
     'captStruct','timeStruct','actionStruct','coinCellArray',...
-    'simulCellArray','allParamNames');
+    'simulCellArray','dropDownCoinList','allParamNames','balayageCellArray');
 
 % Clear remaining variables introduced by load
 clear dimensionStruct lameflexStruct captStruct timeStruct actionStruct ...
-    coinCellArray simulCellArray allParamNames
+    coinCellArray simulCellArray allParamNames dropDownCoinList balayageCellArray
 end
 
