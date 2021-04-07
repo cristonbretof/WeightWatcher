@@ -1,6 +1,6 @@
-function plotBase(link,total_length,total_height,action_mid_x, ...
+function plotDimension(link,total_length,total_height,action_mid_x, ...
     bob_radius,lame,lame_length,capt_length,capt_spacing)
-%PLOTBASE Fonction permettant de présenter la base de la balance
+%PLOTDIMENSION Fonction permettant de présenter la base de la balance
 %   On utilise cette fonction pour présenter les éléments statiques de la
 %   balance. On appelle cette fonction seulement lorsqu'on réinitialise le
 %   simulateur. La représentation est en 2D.
@@ -22,7 +22,7 @@ lame_array = lame + lame_y_pos;
 
 % Lame flexible (definition)
 n_plot_array = 0:0.1:lame_length-1;
-plot(link,n_plot_array,lame_array,'LineWidth',2);
+plot(link,n_plot_array,lame_array,'LineWidth',1);
 
 % Emplacement du point (sur la lame) qui sera suivi par l'actionneur et le plateau
 mid_y = lame_array(ceil(numel(lame_array)/2));

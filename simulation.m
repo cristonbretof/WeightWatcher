@@ -22,7 +22,15 @@ if isempty(app.simulCellArray)
     return;
 end
 
-
+simOut = parsim('simulateur.slx','struct');
 
 ret = 1;
+
+if ~app.balayageEnabled
+    while doRun == 1
+        pause(app.timeStruct.duration);
+        plotBase(app.UIAnim,simOut.wn)
+    end
+end
+save("output.mat",'simOut');
 end
