@@ -21,8 +21,10 @@ lame_y_pos = base_height + fixbar_height - capt_spacing/3;
 lame_array = lame + lame_y_pos;
 
 % Lame flexible (definition)
-n_plot_array = 0:0.1:lame_length-1;
-plot(link,n_plot_array,lame_array,'LineWidth',2);
+n_plot_array = 0:1:lame_length-1;
+plot(link,n_plot_array,lame_array,'LineWidth',3.5);
+
+link.XLim = [0,total_length];
 
 % Emplacement du point (sur la lame) qui sera suivi par l'actionneur et le plateau
 mid_y = lame_array(ceil(numel(lame_array)/2));
@@ -55,7 +57,7 @@ rectangle(link,'Position',[total_length-capt_length,top_height, ...
     capt_length,capt_thickness],'FaceColor',[0.7,0.2,0.05]);
 
 % Électrode inférieure du capteur
-rectangle(link,'Position',[total_length-capt_length,top_height-capt_spacing/2, ...
+rectangle(link,'Position',[total_length-capt_length,top_height-capt_spacing/1.9, ...
     capt_length,capt_thickness],'FaceColor',[0.7,0.2,0.05]);
 
 % Bobine de l'actionneur linéaire (hauteur variable)
