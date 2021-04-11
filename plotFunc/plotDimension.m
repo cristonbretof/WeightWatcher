@@ -17,11 +17,11 @@ action_height = 0.85*fixbar_height; % Hauteur de l'actionneur
 action_width = 4*bob_radius; % Largeur de l'actionneur (base)
 
 % Position de la lame en hauteur
-lame_y_pos = base_height + fixbar_height - capt_spacing/3;
+lame_y_pos = base_height + fixbar_height - capt_spacing;
 lame_array = lame + lame_y_pos;
 
 % Lame flexible (definition)
-n_plot_array = 0:1:lame_length-1;
+n_plot_array = 0:1:numel(lame_array)-1;
 plot(link,n_plot_array,lame_array,'LineWidth',2);
 
 link.XLim = [0,total_length];
@@ -57,7 +57,7 @@ rectangle(link,'Position',[total_length-capt_length,top_height, ...
     capt_length,capt_thickness],'FaceColor',[0.7,0.2,0.05]);
 
 % Électrode inférieure du capteur
-rectangle(link,'Position',[total_length-capt_length,top_height-capt_spacing/1.9, ...
+rectangle(link,'Position',[total_length-capt_length,lame_y_pos-capt_spacing, ...
     capt_length,capt_thickness],'FaceColor',[0.7,0.2,0.05]);
 
 % Bobine de l'actionneur linéaire (hauteur variable)
@@ -68,5 +68,4 @@ rectangle(link,'Position',[action_mid_x+0.15*action_width, ...
 % Plateau pour les pièces
 rectangle(link,'Position',[action_mid_x,mid_y,action_width, ...
     0.5],'FaceColor',[0.6,0.6,0.6]);
-
 end
