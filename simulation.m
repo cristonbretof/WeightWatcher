@@ -26,14 +26,9 @@ for i=1:simu_row
     end
 end
 
-app.timeStruct.num_samples
-app.timeStruct.duration
-
 mass_event_time = zeros(1,app.timeStruct.num_samples);
-% n_mass_event_time = 0:
 
 total_mass = 0;
-mass_index = 0;
 
 evt = 1;
 elapsed_time = 0;
@@ -45,15 +40,16 @@ for i=1:app.timeStruct.num_samples
         if strcmp(app.simulCellArray{evt,2},"Ajouter")
             total_mass = total_mass + ...
                 app.coinCellArray{str2double(app.simulCellArray{evt,3}),3} * ...
-                app.coinCellArray{str2double(app.simulCellArray{evt,3}),5};
+                (app.coinCellArray{str2double(app.simulCellArray{evt,3}),5}/1000);
         elseif strcmp(app.simulCellArray{evt,2},"Retirer")
-            if total_mass - app.coinCellArray{str2double(app.simulCellArray{evt,3}),5} < 0
+            if total_mass - app.coinCellArray{str2double(app.simulCellArray{evt,3}),3}* ...
+                    (app.coinCellArray{str2double(app.simulCellArray{evt,3}),5}/1000) < 0
                 msg = "La suite d'évènement est invalide (une masse négative est sur la balance)";
                 return;
             else
                 total_mass = total_mass - ...
                     app.coinCellArray{str2double(app.simulCellArray{evt,3}),3} * ...
-                    app.coinCellArray{str2double(app.simulCellArray{evt,3}),5};
+                    (app.coinCellArray{str2double(app.simulCellArray{evt,3}),5}/1000);
             end
         end
         evt = evt + 1;
@@ -62,33 +58,55 @@ for i=1:app.timeStruct.num_samples
     elapsed_time = i*app.timeStruct.duration;
 end
 
+% Set global Simulink configurations (timing and such)
 set_param('simulateur_final','StopTime',num2str(app.timeStruct.duration*app.timeStruct.num_samples));
 set_param('simulateur_final','FixedStep',num2str(app.timeStruct.duration));
-set_param('simulateur_final/dt','Value',num2str(app.timeStruct.duration));
-set_param('simulateur_final/dt','Value',num2str(app.timeStruct.duration));
-set_param('simulateur_final/dt','Value',num2str(app.timeStruct.duration));
-set_param('simulateur_final/dt','Value',num2str(app.timeStruct.duration));
-set_param('simulateur_final/dt','Value',num2str(app.timeStruct.duration));
-set_param('simulateur_final/dt','Value',num2str(app.timeStruct.duration));
-set_param('simulateur_final/dt','Value',num2str(app.timeStruct.duration));
-set_param('simulateur_final/dt','Value',num2str(app.timeStruct.duration));
-set_param('simulateur_final/dt','Value',num2str(app.timeStruct.duration));
-set_param('simulateur_final/dt','Value',num2str(app.timeStruct.duration));
-set_param('simulateur_final/dt','Value',num2str(app.timeStruct.duration));
-set_param('simulateur_final/dt','Value',num2str(app.timeStruct.duration));
-set_param('simulateur_final/dt','Value',num2str(app.timeStruct.duration));
 
+% Set parameters within constants in the simulator
+
+% Lame configurations
+set_param('simulateur_final/dt','Value',num2str(app.timeStruct.duration));
+set_param('simulateur_final/d_lame','Value',num2str(app.lameflexStruct.thick));
+set_param('simulateur_final/t_lame','Value',num2str(app.lameflexStruct.width));
+set_param('simulateur_final/L_lame','Value',num2str(app.lameflexStruct.length));
+set_param('simulateur_final/E','Value',num2str(app.lameflexStruct.E));
+set_param('simulateur_final/J','Value',num2str(app.lameflexStruct.J));
+set_param('simulateur_final/masse_lame','Value',num2str(app.lameflexStruct.mass));
+set_param('simulateur_final/masse_action','Value',num2str(app.actionStruct.m));
+set_param('simulateur_final/Gamma','Value',num2str(app.lameflexStruct.Att));
+set_param('simulateur_final/dens','Value',num2str(app.lameflexStruct.mu));
+set_param('simulateur_final/wn','Value',num2str(app.lameflexStruct.wn));
+set_param('simulateur_final/pos_act','Value',num2str(app.dimensionStruct.pos_act));
+set_param('simulateur_final/pos_obj','Value',num2str(app.dimensionStruct.pos_act));
+
+% Position detector configurations
+set_param('simulateur_final/Vim','Value',num2str(app.captStruct.Vim));
+set_param('simulateur_final/e_0','Value',num2str(app.captStruct.spacing/2));
+set_param('simulateur_final/G1','Value','125');
+set_param('simulateur_final/G2','Value','0.6');
+set_param('simulateur_final/Vth','Value',num2str(app.captStruct.Vth));
+
+% PID configurations
+set_param('simulateur_final/Kp','Value',num2str(app.captStruct.Kp));
+set_param('simulateur_final/Ki','Value',num2str(app.captStruct.Ki));
+set_param('simulateur_final/Kd','Value',num2str(app.captStruct.Kd));
+set_param('simulateur_final/v0','Value','2.5');
+
+% Amplifier configurations
+set_param('simulateur_final/Amplificateur','Gain', ...
+    num2str(app.dimensionStruct.gain_ampli));
+
+% Save mass array to input in lame model
+save("simu_input_data.mat",'mass_event_time');
+
+% Create an input object
+% simIn = Simulink.SimulationInput('simulateur_final');
+simOut = sim('simulateur_final');
 
 % Open simulation
 % model = 'simulateur_final';
 % open_system(model, 'loadonly');
-% 
-% save("simu_input_data.mat");
-% 
-% clear 
 
-% busInfo = Simulink.Bus.createObject(baseStruct);
-% busInfo
 % Check if balayage is enabled
 % [row,col] = size(app.balayageCellArray);
 % if app.balayageEnabled
@@ -101,84 +119,178 @@ set_param('simulateur_final/dt','Value',num2str(app.timeStruct.duration));
 %             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Position du plateau")
-%             b_index = b_index + 1;
+%             tag = 
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Longueur de la lame")
-%             b_index = b_index + 1;
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Largeur de la lame")
-%             b_index = b_index + 1;
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Épaisseur de la lame")
-%             b_index = b_index + 1;
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Masse de la lame")
-%             b_index = b_index + 1;
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Constante b de la lame")
-%             b_index = b_index + 1;
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Module de Young E")
-%             b_index = b_index + 1;
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Moment daire J")
-%             b_index = b_index + 1;
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Atténuation de la lame")
-%             b_index = b_index + 1;
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Fréquence naturelle de la lame")
-%             b_index = b_index + 1;
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Densité de masse de la lame")
-%             b_index = b_index + 1;
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Rayon de la bobine")
-%             b_index = b_index + 1;
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Hauteur de la bobine")
-%             b_index = b_index + 1;
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Diamètre des spires")
-%             b_index = b_index + 1;
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Inductance L de lactionneur")
-%             b_index = b_index + 1;
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Nombre de spires")
-%             b_index = b_index + 1;
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Perméabilité relative de la bobine")
-%             b_index = b_index + 1;
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
+%         end
+%         if strcmp(app.balayageCellArray{i,1},"Champs magnétique B")
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Constante Kp du PID")
-%             b_index = b_index + 1;
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Constante Ki du PID")
-%             b_index = b_index + 1;
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Constante Kd du PID")
-%             b_index = b_index + 1;
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Tension Vim du capteur de position")
-%             b_index = b_index + 1;
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Tension Vth du capteur de position")
-%             b_index = b_index + 1;
+%             legend_tag = app.balayageCellArray{i,1};
+%             parsim_array = app.balayageCellArray{i,2}: ...
+%                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
+%             numSims = length(parsim_array);
+%             break;
 %         end
 %     end
+%     for i=numSims:-1:1
+%         in(i) = Simulink.SimulationInput('simulateur_final');
+%         in(i) = setVariable(in(i),tag,relSlip_vals(i));
+%     end
 % end
+
 
 % Open simulation
 % model = 'simulateur';
 % open_system(model);
-
-% Create an input object
-% simIn = Simulink.SimulationInput('simulateur');
-% simIn = simIn.setVariable('len_lame',app.lameflexStruct.length,...
-%                           'mass_lame',app.lameflexStruct.mass);
-% simIn
-% simOut = parsim(in);
 % sign = -1;
 % app.LameArray = zeros(1,(app.lameflexStruct.length-1)+1);
 % for j=1:100
@@ -198,7 +310,7 @@ set_param('simulateur_final/dt','Value',num2str(app.timeStruct.duration));
 %                 app.lameflexStruct.length/4,app.captStruct.spacing/2);
 %     close all
 % end
-% ret = 1;
-% save("output.mat",'simOut');
+ret = 1;
+save("output.mat",'simOut');
 
 end
