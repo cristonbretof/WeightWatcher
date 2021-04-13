@@ -1,6 +1,8 @@
 function [ret, msg] = simulation(app)
 %SIMULATION Summary of this function goes here
 %   Detailed explanation goes here
+clc
+clear 'out'
 
 ret = 0;
 msg = "Success";
@@ -26,17 +28,22 @@ for i=1:simu_row
     end
 end
 
+app.Lamp.Color = 'blue';
+app.AmorcerlasimulationButton.Text = "En attente...";
 mass_event_time = zeros(1,app.timeStruct.num_samples);
+n_mass_event_time = 0:app.timeStruct.duration:(app.timeStruct.num_samples-1)*...
+    app.timeStruct.duration;
 
 total_mass = 0;
 
+% Build mass vector to feed dynamic mass in Simulink
 evt = 1;
 elapsed_time = 0;
 for i=1:app.timeStruct.num_samples
     if evt > simu_row
         break;
     end
-    if elapsed_time == app.simulCellArray{evt,1}/1000
+    if elapsed_time == app.simulCellArray{evt,1}/1000000
         if strcmp(app.simulCellArray{evt,2},"Ajouter")
             total_mass = total_mass + ...
                 app.coinCellArray{str2double(app.simulCellArray{evt,3}),3} * ...
@@ -58,59 +65,81 @@ for i=1:app.timeStruct.num_samples
     elapsed_time = i*app.timeStruct.duration;
 end
 
+% Load block diagram
+load_system('simulateur');
+
 % Set global Simulink configurations (timing and such)
-set_param('simulateur_final','StopTime',num2str(app.timeStruct.duration*app.timeStruct.num_samples));
-set_param('simulateur_final','FixedStep',num2str(app.timeStruct.duration));
+set_param('simulateur','StopTime',num2str(app.timeStruct.duration*app.timeStruct.num_samples));
+set_param('simulateur','FixedStep',num2str(app.timeStruct.duration));
 
 % Set parameters within constants in the simulator
-
 % Lame configurations
-set_param('simulateur_final/dt','Value',num2str(app.timeStruct.duration));
-set_param('simulateur_final/d_lame','Value',num2str(app.lameflexStruct.thick));
-set_param('simulateur_final/t_lame','Value',num2str(app.lameflexStruct.width));
-set_param('simulateur_final/L_lame','Value',num2str(app.lameflexStruct.length));
-set_param('simulateur_final/E','Value',num2str(app.lameflexStruct.E));
-set_param('simulateur_final/J','Value',num2str(app.lameflexStruct.J));
-set_param('simulateur_final/masse_lame','Value',num2str(app.lameflexStruct.mass));
-set_param('simulateur_final/masse_action','Value',num2str(app.actionStruct.m));
-set_param('simulateur_final/Gamma','Value',num2str(app.lameflexStruct.Att));
-set_param('simulateur_final/dens','Value',num2str(app.lameflexStruct.mu));
-set_param('simulateur_final/wn','Value',num2str(app.lameflexStruct.wn));
-set_param('simulateur_final/pos_act','Value',num2str(app.dimensionStruct.pos_act));
-set_param('simulateur_final/pos_obj','Value',num2str(app.dimensionStruct.pos_act));
+set_param('simulateur/dt','Value',num2str(app.timeStruct.duration));
+set_param('simulateur/d_lame','Value',num2str(app.lameflexStruct.thick));
+set_param('simulateur/t_lame','Value',num2str(app.lameflexStruct.width));
+set_param('simulateur/L_lame','Value',num2str(app.lameflexStruct.length));
+set_param('simulateur/E','Value',num2str(app.lameflexStruct.E));
+set_param('simulateur/J','Value',num2str(app.lameflexStruct.J));
+set_param('simulateur/masse_lame','Value',num2str(app.lameflexStruct.mass));
+set_param('simulateur/masse_action','Value',num2str(app.actionStruct.m));
+set_param('simulateur/Gamma','Value',num2str(app.lameflexStruct.Att));
+set_param('simulateur/dens','Value',num2str(app.lameflexStruct.mu));
+set_param('simulateur/wn','Value',num2str(app.lameflexStruct.wn));
+set_param('simulateur/pos_act','Value',num2str(app.dimensionStruct.pos_act));
+set_param('simulateur/pos_obj','Value',num2str(app.dimensionStruct.pos_act));
 
 % Position detector configurations
-set_param('simulateur_final/Vim','Value',num2str(app.captStruct.Vim));
-set_param('simulateur_final/e_0','Value',num2str(app.captStruct.spacing/2));
-set_param('simulateur_final/G1','Value','125');
-set_param('simulateur_final/G2','Value','0.6');
-set_param('simulateur_final/Vth','Value',num2str(app.captStruct.Vth));
+set_param('simulateur/Vim','Value',num2str(app.captStruct.Vim));
+set_param('simulateur/e_0','Value',num2str(app.captStruct.spacing/2));
+set_param('simulateur/G1','Value','125');
+set_param('simulateur/G2','Value','0.6');
+set_param('simulateur/Vth','Value',num2str(app.captStruct.Vth));
 
 % PID configurations
-set_param('simulateur_final/Kp','Value',num2str(app.captStruct.Kp));
-set_param('simulateur_final/Ki','Value',num2str(app.captStruct.Ki));
-set_param('simulateur_final/Kd','Value',num2str(app.captStruct.Kd));
-set_param('simulateur_final/v0','Value','2.5');
+set_param('simulateur/Kp','Value',num2str(app.captStruct.Kp));
+set_param('simulateur/Ki','Value',num2str(app.captStruct.Ki));
+set_param('simulateur/Kd','Value',num2str(app.captStruct.Kd));
+set_param('simulateur/v0','Value','2.5');
 
 % Amplifier configurations
-set_param('simulateur_final/Amplificateur','Gain', ...
+set_param('simulateur/Amplificateur','Gain', ...
     num2str(app.dimensionStruct.gain_ampli));
 
+ret = 1;
+
 % Save mass array to input in lame model
-save("simu_input_data.mat",'mass_event_time');
+assignin('base','simin',timeseries(mass_event_time,n_mass_event_time));
+% set_param('simulateur/input_mass','Data','mass_event_time');
+
+model = 'simulateur';
+simOut = sim(model, 'timeout', 60);
 
 % Create an input object
 % simIn = Simulink.SimulationInput('simulateur_final');
-simOut = sim('simulateur_final');
+if ~app.balayageEnabled
+    app.Lamp.Color = 'red';
+    app.AmorcerlasimulationButton.Text = "Arreter l'animation";
+    for i=1:length(simOut.lame.Data)
+        plotBase(app.UIAnim,app.lameflexStruct.length*100,app.dimensionStruct.height*100, ...
+            app.dimensionStruct.pos_act*100,app.actionStruct.radius*100,simOut.lame.Data(:,:,i), ...
+            app.lameflexStruct.length*100,app.dimensionStruct.length*25,...
+            app.captStruct.spacing*200);
+        close all
+        if app.stopSim
+            return;
+        end
+    end
+    ret = 1;
+else
+    msg = "Le balayage n'est pas supporté pour l'instant...";
+    return;
+end
 
-% Open simulation
-% model = 'simulateur_final';
-% open_system(model, 'loadonly');
+% Print all samples to plots
+plot2DData(app.MasseAxes,simOut.masse_finale.Tout,simOut.masse_finale.Data);
+plot2DData(app.PositionAxes,simOut.w_out.Tout,simOut.w_out.Data);
 
-% Check if balayage is enabled
-% [row,col] = size(app.balayageCellArray);
-% if app.balayageEnabled
-%     if (row == 1) && (strcmp(app.balayageCellArray{1,1},"Aucun"))
+% if (row == 1) && (strcmp(app.balayageCellArray{1,1},"Aucun"))
 %         msg = "Aucun élément permettant de faire un balayage";
 %         return;
 %     end
@@ -119,7 +148,6 @@ simOut = sim('simulateur_final');
 %             break;
 %         end
 %         if strcmp(app.balayageCellArray{i,1},"Position du plateau")
-%             tag = 
 %             legend_tag = app.balayageCellArray{i,1};
 %             parsim_array = app.balayageCellArray{i,2}: ...
 %                 app.balayageCellArray{i,3}:app.balayageCellArray{i,4};
@@ -285,8 +313,9 @@ simOut = sim('simulateur_final');
 %         in(i) = Simulink.SimulationInput('simulateur_final');
 %         in(i) = setVariable(in(i),tag,relSlip_vals(i));
 %     end
-% end
 
+% Open simulation
+% model = 'simulateur_final';
 
 % Open simulation
 % model = 'simulateur';
@@ -310,7 +339,5 @@ simOut = sim('simulateur_final');
 %                 app.lameflexStruct.length/4,app.captStruct.spacing/2);
 %     close all
 % end
-ret = 1;
-save("output.mat",'simOut');
 
 end

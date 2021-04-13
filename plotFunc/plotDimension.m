@@ -13,7 +13,7 @@ fixbar_height = total_height; % Hauteur de la plaque de métal tenant la fixe pou
 fixbar_width = base_height*0.8; % Hauteur de la plaque de métal tenant la fixe pour la lame
 fixbar_x_pos = 0; % Position en x de de la plaque tenant la fixe
 
-action_height = 0.85*fixbar_height; % Hauteur de l'actionneur
+action_height = 0.80*fixbar_height; % Hauteur de l'actionneur
 action_width = 4*bob_radius; % Largeur de l'actionneur (base)
 
 % Position de la lame en hauteur
@@ -40,7 +40,7 @@ rectangle(link,'Position',[fixbar_x_pos,base_height,fixbar_width, ...
     fixbar_height],'FaceColor',[0.5,0.5,0.5]);
 
 % Actionneur linéaire
-rectangle(link,'Position',[action_mid_x,base_height,action_width, ...
+rectangle(link,'Position',[action_mid_x-action_width/2,base_height,action_width, ...
     action_height],'FaceColor',[0.7,0.1,0.05]);
 
 % Plaque tenant le capteur choisi
@@ -61,11 +61,12 @@ rectangle(link,'Position',[total_length-capt_length,lame_y_pos-capt_spacing, ...
     capt_length,capt_thickness],'FaceColor',[0.7,0.2,0.05]);
 
 % Bobine de l'actionneur linéaire (hauteur variable)
-rectangle(link,'Position',[action_mid_x+0.15*action_width, ...
+rectangle(link,'Position',[action_mid_x+0.15*action_width-action_width/2, ...
     base_height+action_height,0.7*action_width,...
     mid_y-action_height-base_height],'FaceColor',[0.6,0.1,0.05]);
 
 % Plateau pour les pièces
-rectangle(link,'Position',[action_mid_x,mid_y,action_width, ...
-    0.5],'FaceColor',[0.6,0.6,0.6]);
+rectangle(link,'Position',[action_mid_x-action_width/2,mid_y,action_width, ...
+    0.3],'FaceColor',[0.6,0.6,0.6]);
+
 end
